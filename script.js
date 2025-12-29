@@ -10,21 +10,37 @@ window.loadData = async function() {
     console.log('✅ Mappate:', mappate.map(a => `${a.nome}(${a.tag})`));
     window.showTab('actions');
     
-    const tagMapping = {
-      'azione': '1azione', '1 azione': '1azione',
-      'azione bonus': '1azionbonus', '1 azione bonus': '1azionbonus',
-      'reazione': 'reazione',
-      'rituale': 'rituale',
-      'altro': 'altro'
+    // 🔧 PULISCI TUTTI UL PRIMA
+    ['1azione','1azionbonus','reazione','rituale','altro'].forEach(id => {
+      const ul = document.getElementById(id);
+      if (ul) ul.innerHTML = '';
+    });
+    
+    // 🔧 AGGREGA per UL (NON sovrascrive)
+    const ulContent = {
+      '1azione': [],
+      '1azionbonus': [],
+      'reazione': [],
+      'rituale': [],
+      'altro': []
     };
     
-    Object.entries(tagMapping).forEach(([tagSheet, ulId]) => {
+    mappate.forEach(a => {
+      let ulId = 'altro';
+      if (a.tag === 'azione' || a.tag === '1 azione') ulId = '1azione';
+      else if (a.tag === 'azione bonus' || a.tag === '1 azione bonus') ulId = '1azionbonus';
+      else if (a.tag === 'reazione') ulId = 'reazione';
+      else if (a.tag === 'rituale') ulId = 'rituale';
+      
+      ulContent[ulId].push(a);
+    });
+    
+    // 🔧 POPOLA TUTTI INSIEME
+    Object.entries(ulContent).forEach(([ulId, azioni]) => {
       const ul = document.getElementById(ulId);
       if (ul) {
-        const filtered = mappate.filter(a => a.tag === tagSheet);
-        if (filtered.length) {
-          // 🔧 APPEND invece di sovrascrivi
-          const html = filtered.map(a => 
+        ul.innerHTML = azioni.length ? 
+          azioni.map(a => 
             `<li><strong>${a.nome}</strong> 
               ${a.livello ? `<small>L${a.livello}</small>` : ''}
               <br>${a.desc}
@@ -32,14 +48,11 @@ window.loadData = async function() {
               ${a.rituale ? '<span class="rituale">📜 RITUALE</span>' : ''}
               ${a.note ? `<br><small>${a.note}</small>` : ''}
             </li>`
-          ).join('');
-          ul.innerHTML = html; // Pulisci e riempi
-        } else {
-          ul.innerHTML = '<li>Nessuna</li>';
-        }
-        console.log(`📋 ${tagSheet} → ${ulId}: ${filtered.length}`);
+          ).join('') : '<li>Nessuna</li>';
+        console.log(`📋 ${ulId}: ${azioni.length}`);
       }
     });
+    
   } catch(e) {
     console.error('❌', e);
   }
