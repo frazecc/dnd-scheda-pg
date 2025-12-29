@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scheda PG D&D 5e</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🧙 Scheda PG D&D 5e</h1>
+  
+  <nav class="tabs">
+    <button onclick="showTab('main')" id="main-tab" class="active">📋 Principale</button>
+    <button onclick="showTab('actions')" id="actions-tab">⚔️ Azioni</button>
+    <button onclick="loadData()">🔄 Aggiorna da Sheet</button>
+  </nav>
+
+  <div id="main" class="tab-content active">
+    <h2>Scheda Base</h2>
+    <input id="nomePG" placeholder="Nome PG" />
+    <input id="classe" placeholder="Classe/Livello" />
+    <input id="hp" placeholder="HP Max" />
+  </div>
+
+  <div id="actions" class="tab-content">
+    <h2>1️⃣ Azioni</h2><ul id="1azione"></ul>
+    <h2>⚡ Azioni Bonus</h2><ul id="1azionbonus"></ul>
+    <h2>🛡️ Reazioni</h2><ul id="reazione"></ul>
+    <h2>📜 Rituali</h2><ul id="rituale"></ul>
+    <h2>❓ Altro</h2><ul id="altro"></ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
