@@ -43,16 +43,13 @@
     </div>
 
     <script>
-        // TUO NUOVO URL CORRETTO
-        const API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://script.google.com/macros/s/AKfycbxYkaF6GIwSaOVunn3YvQsc30Tap71YBzk8tbFBexJJhgQf22zJgf2OjOsZ3W8rJcSCfg/exec');
+        // TUO ULTIMO URL
+        const API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://script.google.com/macros/s/AKfycbwv7NNYOcIRXPjO2Hq-WySM2WiWySF2JaKrKa5f3lWc0oB2W8OddzbKrNS-NmzVJrqZ/exec');
         
         async function caricaDati() {
             try {
-                console.log('🔄 Caricando:', API_URL);
                 const response = await fetch(API_URL);
                 const data = await response.json();
-                console.log('✅ Dati:', data);
-                
                 const pg = data.pg || {};
                 
                 const infoHTML = `
@@ -92,7 +89,7 @@
                 
             } catch(error) {
                 document.getElementById('loading').innerHTML = `❌ Errore: ${error.message}`;
-                console.error('Errore:', error);
+                console.error(error);
             }
         }
         
