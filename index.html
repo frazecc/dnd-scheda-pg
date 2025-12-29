@@ -16,6 +16,9 @@
         .section{padding:15px;margin:15px 0;border:1px solid #ddd;border-radius:8px;background:#fafafa}
         .section h2{background:#8B4513;color:white;padding:10px;margin:0;border-radius:5px 5px 0 0}
         .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
+        .classe-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+        .classe-item{padding:8px;background:#e8f4f8;border-radius:5px}
+        .classe-main{font-weight:bold;font-size:1.1em;background:#d4edda !important}
         nav{text-align:center;margin:20px 0}
         nav a{display:inline-block;padding:10px 20px;background:#8B4513;color:white;text-decoration:none;border-radius:5px;margin:0 10px;font-weight:bold}
         nav a:hover{background:#A0522D}
@@ -34,6 +37,11 @@
                 <div id="info-base" class="info-grid"></div>
             </div>
 
+            <div class="section">
+                <h2>Classe & Livello</h2>
+                <div id="classi"></div>
+            </div>
+
             <div class="stats" id="stats"></div>
 
             <nav>
@@ -43,7 +51,6 @@
     </div>
 
     <script>
-        // TUO ULTIMO URL
         const API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://script.google.com/macros/s/AKfycbwv7NNYOcIRXPjO2Hq-WySM2WiWySF2JaKrKa5f3lWc0oB2W8OddzbKrNS-NmzVJrqZ/exec');
         
         async function caricaDati() {
@@ -52,16 +59,34 @@
                 const data = await response.json();
                 const pg = data.pg || {};
                 
-                const infoHTML = `
+                // Info base
+                document.getElementById('info-base').innerHTML = `
                     <div><strong>Nome:</strong> ${pg.nome || 'N/A'}</div>
                     <div><strong>Razza:</strong> ${pg.razza || 'N/A'}</div>
-                    <div><strong>Classe:</strong> ${pg.classe || 'N/A'} ${pg.livello || ''}</div>
                     <div><strong>PF:</strong> ${pg.pf_max || '0'}/${pg.pf_max || '0'}</div>
                     <div><strong>CA:</strong> ${pg.ca || '0'}</div>
                     <div><strong>Allineamento:</strong> ${pg.allineamento || 'N/A'}</div>
                 `;
-                document.getElementById('info-base').innerHTML = infoHTML;
                 
+                // Classi + multiclasse
+                const classi = [
+                    {nome: pg.classe || '', livello: pg.livello || 0, principale: true},
+                    {nome: pg.classe2 || '', livello: pg.livello2 || 0},
+                    {nome: pg.classe3 || '', livello: pg.livello3 || 0},
+                    {nome: pg.classe4 || '', livello: pg.livello4 || 0},
+                    {nome: pg.classe5 || '', livello: pg.livello5 || 0}
+                ].filter(c => c.nome && c.livello > 0);
+                
+                const classiHTML = classi.map(c => `
+                    <div class="classe-item ${c.principale ? 'classe-main' : ''}">
+                        <div><strong>${c.nome}</strong></div>
+                        <div>Livello ${c.livello}</div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('classi').innerHTML = classiHTML || '<em>Nessuna classe trovata</em>';
+                
+                // Stats
                 const stats = [
                     {nome: 'Forza', valore: pg.forza || 10},
                     {nome: 'Destrezza', valore: pg.destrezza || 10},
@@ -70,30 +95,3 @@
                     {nome: 'Saggezza', valore: pg.saggezza || 10},
                     {nome: 'Carisma', valore: pg.carisma || 10}
                 ];
-                
-                const statsHTML = stats.map(stat => {
-                    const mod = Math.floor((stat.valore - 10) / 2);
-                    const modSign = mod >= 0 ? `+${mod}` : mod;
-                    return `
-                        <div class="stat">
-                            <h3>${stat.nome}</h3>
-                            <div class="ability-score">${stat.valore}</div>
-                            <div class="modifier">${modSign}</div>
-                        </div>
-                    `;
-                }).join('');
-                
-                document.getElementById('stats').innerHTML = statsHTML;
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-                
-            } catch(error) {
-                document.getElementById('loading').innerHTML = `❌ Errore: ${error.message}`;
-                console.error(error);
-            }
-        }
-        
-        window.addEventListener('load', caricaDati);
-    </script>
-</body>
-</html>
