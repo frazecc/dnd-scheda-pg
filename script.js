@@ -4,41 +4,51 @@ let pgData = {};
 
 async function loadData() {
   try {
-    console.log('Caricamento dati...');
+    console.log('🔄 Caricamento...');
     const res = await fetch(API_URL);
-    const {tutteAzioni} = await res.json();
-    console.log('Dati ricevuti:', tutteAzioni);
+    const data = await res.json();
+    console.log('📊 Dati API:', data);
     
     pgData = {
       '1 azione': [], '1 azione bonus': [], 'reazione': [],
       'rituale': [], 'altro': []
     };
     
-    tutteAzioni.forEach(azione => {
-      if (azione.nome && azione.tag) {
-        if (pgData[azione.tag]) pgData[azione.tag].push(azione);
-        else pgData['altro'].push(azione);
+    // ✅ DEBUG: mostra tutti i dati grezzi
+    data.tutteAzioni.forEach((row, i) => {
+      console.log(`Riga ${i}:`, row);
+      if (row.nome && row.tag) {
+        if (pgData[row.tag]) pgData[row.tag].push(row);
+        else pgData['altro'].push(row);
       }
     });
     
-    console.log('pgData categorizzata:', pgData);
+    console.log('✅ pgData:', pgData);
     populateActions();
   } catch(e) { 
-    console.error('Errore API:', e);
-    alert('Errore caricamento: ' + e.message); 
+    console.error('❌ Errore:', e);
+    alert('Errore: ' + e.message); 
   }
 }
 
 function populateActions() {
-  const tipi = ['1 azione','1 azione bonus','reazione','rituale','altro'];
+  console.log('🎨 Popolo azioni...');
   
-  tipi.forEach(tipo => {
-    const cleanId = tipo.replace(/ /g, '');
-    const ul = document.getElementById(cleanId);
+  // ✅ VERIFICA OGNI UL esiste
+  const mapping = {
+    '1azione': '1 azione',
+    '1azionbonus': '1 azione bonus',
+    'reazione': 'reazione',
+    'rituale': 'rituale',
+    'altro': 'altro'
+  };
+  
+  Object.entries(mapping).forEach(([id, tipo]) => {
+    const ul = document.getElementById(id);
+    console.log(`UL ${id}:`, ul ? '✅ OK' : '❌ MANCANTE');
     
-    // VERIFICA che l'elemento esista
     if (!ul) {
-      console.error('UL mancante:', cleanId);
+      console.error(`❌ UL #${id} non trovato!`);
       return;
     }
     
@@ -60,19 +70,19 @@ function showTab(tab) {
   document.getElementById(tab + '-tab')?.classList.add('active');
 }
 
-// ✅ ASPETTA DOM PRIMA DI ESEGUIRE
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM caricato');
+// ✅ DOM COMPLETAMENTE CARICO
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 DOM pronto');
   
-  // Carica nomePG salvato
   const nomePG = document.getElementById('nomePG');
   if (nomePG) {
     nomePG.value = localStorage.getItem('nomePG') || '';
-    nomePG.addEventListener('input', e => 
-      localStorage.setItem('nomePG', e.target.value)
-    );
+    nomePG.addEventListener('input', e => localStorage.setItem('nomePG', e.target.value));
   }
   
-  // Auto-load dopo 500ms (tempo per render HTML)
-  setTimeout(loadData, 500);
+  // Carica dopo 1 secondo (tempo per tutto)
+  setTimeout(() => {
+    console.log('⏰ Auto-load...');
+    loadData();
+  }, 1000);
 });
