@@ -1,72 +1,100 @@
-<!-- index.html - Scheda D&D 5e -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scheda PG D&D 5e</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text y='28' font-size='28' fill='%23333'>F</text></svg>">
     <style>
         body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:20px;background:#f5f5f5;color:#333}
         .sheet{max-width:900px;margin:0 auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 20px rgba(0,0,0,0.1)}
         .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:20px 0}
-        .stat{border:2px solid #8B4513;padding:15px;border-radius:8px;text-align:center}
+        .stat{border:2px solid #8B4513;padding:15px;border-radius:8px;text-align:center;background:#fafafa}
         .stat h3{margin:0 0 10px;font-size:18px;color:#8B4513}
         .ability-score{font-size:36px;font-weight:bold;color:#D2691E;margin:10px 0}
-        .modifier{font-size:24px;color:#FF4500}
+        .modifier{font-size:24px;color:#FF4500;font-weight:bold}
         .section{padding:15px;margin:15px 0;border:1px solid #ddd;border-radius:8px;background:#fafafa}
         .section h2{background:#8B4513;color:white;padding:10px;margin:0;border-radius:5px 5px 0 0}
+        .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
         nav{text-align:center;margin:20px 0}
-        nav a{display:inline-block;padding:10px 20px;background:#8B4513;color:white;text-decoration:none;border-radius:5px;margin:0 10px}
+        nav a{display:inline-block;padding:10px 20px;background:#8B4513;color:white;text-decoration:none;border-radius:5px;margin:0 10px;font-weight:bold}
         nav a:hover{background:#A0522D}
+        .loading{text-align:center;padding:40px;color:#8B4513}
+        @media (max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}}
     </style>
 </head>
 <body>
     <div class="sheet">
         <h1 style="text-align:center;color:#8B4513;font-size:2.5em;margin-bottom:10px">Scheda Personaggio D&D 5e</h1>
         
-        <div class="stats">
-            <div class="stat">
-                <h3>Forza</h3>
-                <div class="ability-score">15</div>
-                <div class="modifier">+2</div>
+        <div id="loading" class="loading">Caricamento dati dal Google Sheet...</div>
+        <div id="content" style="display:none">
+            <div class="section">
+                <h2>Informazioni Base</h2>
+                <div id="info-base" class="info-grid"></div>
             </div>
-            <div class="stat">
-                <h3>Destrezza</h3>
-                <div class="ability-score">14</div>
-                <div class="modifier">+2</div>
-            </div>
-            <div class="stat">
-                <h3>Costituzione</h3>
-                <div class="ability-score">16</div>
-                <div class="modifier">+3</div>
-            </div>
-            <div class="stat">
-                <h3>Intelligenza</h3>
-                <div class="ability-score">10</div>
-                <div class="modifier">+0</div>
-            </div>
-            <div class="stat">
-                <h3>Saggezza</h3>
-                <div class="ability-score">12</div>
-                <div class="modifier">+1</div>
-            </div>
-            <div class="stat">
-                <h3>Carisma</h3>
-                <div class="ability-score">13</div>
-                <div class="modifier">+1</div>
-            </div>
-        </div>
 
-        <div class="section">
-            <h2>Informazioni Base</h2>
-            <p><strong>Nome:</strong> [Il tuo PG] | <strong>Classe/Livello:</strong> Guerriero 3 | <strong>PF:</strong> 28/28 | <strong>CA:</strong> 16</p>
-            <p><strong>Allineamento:</strong> Legale Buono | <strong>Razza:</strong> Umano | <strong>Background:</strong> Soldato</p>
-        </div>
+            <div class="stats" id="stats"></div>
 
-        <nav>
-            <a href="azioni.html">📜 Azioni & Incantesimi</a>
-        </nav>
+            <nav>
+                <a href="azioni.html">📜 Azioni & Incantesimi</a>
+            </nav>
+        </div>
     </div>
+
+    <script>
+        const API_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://script.google.com/macros/s/AKfycbwG_MbXEp7PXQbV_cmr9w73TtfbW93MmgZ70Xq897Rdy2qk8htF3DLucBVvUotqSioaQw/exec');
+        
+        async function caricaDati() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                const pg = data.pg || {};
+                
+                // Info base
+                const infoHTML = `
+                    <div><strong>Nome:</strong> ${pg.nome || 'N/A'}</div>
+                    <div><strong>Razza:</strong> ${pg.razza || 'N/A'}</div>
+                    <div><strong>Classe:</strong> ${pg.classe || 'N/A'} ${pg.livello || ''}</div>
+                    <div><strong>PF:</strong> ${pg.pf_max || '0'}/<span id="pf-max">${pg.pf_max || '0'}</span></div>
+                    <div><strong>CA:</strong> ${pg.ca || '0'}</div>
+                    <div><strong>Allineamento:</strong> ${pg.allineamento || 'N/A'}</div>
+                `;
+                document.getElementById('info-base').innerHTML = infoHTML;
+                
+                // Stats con modificatori
+                const stats = [
+                    {nome: 'Forza', valore: pg.forza},
+                    {nome: 'Destrezza', valore: pg.destrezza},
+                    {nome: 'Costituzione', valore: pg.costituzione},
+                    {nome: 'Intelligenza', valore: pg.intelligenza},
+                    {nome: 'Saggezza', valore: pg.saggezza},
+                    {nome: 'Carisma', valore: pg.carisma}
+                ];
+                
+                const statsHTML = stats.map(stat => {
+                    const mod = Math.floor((stat.valore - 10) / 2);
+                    const modSign = mod >= 0 ? `+${mod}` : mod;
+                    return `
+                        <div class="stat">
+                            <h3>${stat.nome}</h3>
+                            <div class="ability-score">${stat.valore}</div>
+                            <div class="modifier">${modSign}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('stats').innerHTML = statsHTML;
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+            } catch(error) {
+                document.getElementById('loading').innerHTML = '❌ Errore caricamento. Controlla il foglio "SchedaPG".';
+                console.error(error);
+            }
+        }
+        
+        window.addEventListener('load', caricaDati);
+    </script>
 </body>
 </html>
