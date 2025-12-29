@@ -37,13 +37,17 @@
     </div>
 
     <script>
-        const API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://script.google.com/macros/s/AKfycbwG_MbXEp7PXQbV_cmr9w73TtfbW93MmgZ70Xq897Rdy2qk8htF3DLucBVvUotqSioaQw/exec');
+        // TUO NUOVO URL CORRETTO
+        const API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://script.google.com/macros/s/AKfycbxYkaF6GIwSaOVunn3YvQsc30Tap71YBzk8tbFBexJJhgQf22zJgf2OjOsZ3W8rJcSCfg/exec');
         
         async function caricaAzioni() {
             const container = document.getElementById('azioni');
             try {
+                console.log('🔄 Caricando:', API_URL);
                 const response = await fetch(API_URL);
                 const data = await response.json();
+                console.log('✅ Dati:', data);
+                
                 const azioni = data.azioni || [];
                 
                 if (!Array.isArray(azioni) || azioni.length === 0) {
@@ -93,7 +97,7 @@
                 container.innerHTML = `
                     <div class="error">
                         ❌ Errore: ${error.message}<br>
-                        <small>Testa API: <a href="https://script.google.com/macros/s/AKfycbwG_MbXEp7PXQbV_cmr9w73TtfbW93MmgZ70Xq897Rdy2qk8htF3DLucBVvUotqSioaQw/exec" target="_blank">Link</a></small>
+                        <small><a href="https://script.google.com/macros/s/AKfycbxYkaF6GIwSaOVunn3YvQsc30Tap71YBzk8tbFBexJJhgQf22zJgf2OjOsZ3W8rJcSCfg/exec" target="_blank">Test API</a></small>
                     </div>`;
             }
         }
