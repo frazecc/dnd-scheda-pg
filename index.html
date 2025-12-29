@@ -1,68 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scheda PG D&D 5e Ufficiale</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="icon" href="./favicon.ico" type="image/x-icon">
-</head>
+<html><head><title>Scheda PG D&D 5e</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="favicon.ico"></head>
 <body>
-  <div class="page">
-    <!-- HEADER UFFICIALE -->
-    <header class="header">
-      <div class="header-left">
-        <input id="razza" placeholder="RAZZA" class="big-input">
-        <input id="nomePG" placeholder="NOME PERSONAGGIO" class="big-input">
-      </div>
-      <div class="header-right">
-        <input id="classe" placeholder="CLASSE">
-        <input id="livello" placeholder="LIVELLO">
-        <input id="giocatore" placeholder="NOME GIOCATORE">
-        <input id="background" placeholder="BACKGROUND">
-        <input id="allineamento" placeholder="ALLINEAMENTO">
-      </div>
-    </header>
-
-    <!-- NAVIGAZIONE -->
-    <nav class="tabs">
-      <button onclick="showTab('stats')" id="stats-tab" class="active">📊 Caratteristiche</button>
-      <button onclick="showTab('actions')" id="actions-tab">⚔️ Azioni</button>
-      <button onclick="loadData()">🔄 Aggiorna Sheet</button>
-    </nav>
-
-    <!-- COLONNA SINISTRA - CARATTERISTICHE -->
-    <div id="stats" class="tab-content active column-left">
-      <div class="stats-grid">
-        <div class="stat-block">
-          <label>FORZA</label>
-          <input id="forza" class="stat-mod">
-          <input id="forza-mod" placeholder="MOD">
-        </div>
-        <div class="stat-block">
-          <label>DESTREZZA</label>
-          <input id="destrezza-mod" placeholder="MOD">
-        </div>
-      </div>
-      
-      <div class="hp-section">
-        <label>CA</label><input id="ca">
-        <label>PF Massimi</label><input id="hp-max">
-        <label>PF Attuali</label><input id="hp-current">
-      </div>
-    </div>
-
-    <!-- COLONNA DESTRA - AZIONI EXTRA -->
-    <div id="actions" class="tab-content column-right">
-      <h2>AZIONI</h2><ul id="1azione"></ul>
-      <h2>AZIONI BONUS</h2><ul id="1azionbonus"></ul>
-      <h2>REA ZIONI</h2><ul id="reazione"></ul>
-      <h2>RITUALI</h2><ul id="rituale"></ul>
-      <h2>ALTRO</h2><ul id="altro"></ul>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
+  <h1>Scheda Personaggio</h1>
+  <!-- Campi: nome, classe, HP, stats, ecc. Adatta da https://codepen.io/jerhemy/pen/eEPyQG -->
+  <a href="azioni.html">Azioni</a>
+</body></html>
