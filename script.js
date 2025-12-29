@@ -6,9 +6,19 @@ window.loadData = async function() {
     const response = await res.json();
     const mappate = response.tutteAzioni || [];
     
-    console.log('ALL DATA:', mappate.map(a => ({nome: a.nome, tag: a.tag})));
+    console.log('ALL DATA:', mappate);
     
     window.showTab('actions');
+    
+    // RIEMPI TUTTI GLI INPUT DALLE RIGHE
+    mappate.forEach(row => {
+      Object.keys(row).forEach(key => {
+        const el = document.getElementById(key);
+        if (el && row[key]) {
+          el.value = row[key];
+        }
+      });
+    });
     
     // PULISCI TUTTI
     ['1azione','1azionbonus','reazione','rituale','altro'].forEach(id => {
@@ -19,15 +29,15 @@ window.loadData = async function() {
     // AGGREGA TUTTE LE AZIONI
     mappate.forEach(a => {
       let ulId = 'altro';
-      if (a.tag.includes('azione') && !a.tag.includes('bonus')) ulId = '1azione';
-      else if (a.tag.includes('bonus')) ulId = '1azionbonus';
-      else if (a.tag.includes('reazione')) ulId = 'reazione';
-      else if (a.tag.includes('rituale')) ulId = 'rituale';
+      if (a.tag && a.tag.includes('azione') && !a.tag.includes('bonus')) ulId = '1azione';
+      else if (a.tag && a.tag.includes('bonus')) ulId = '1azionbonus';
+      else if (a.tag && a.tag.includes('reazione')) ulId = 'reazione';
+      else if (a.tag && a.tag.includes('rituale')) ulId = 'rituale';
       
       const ul = document.getElementById(ulId);
       if (ul) {
         const li = document.createElement('li');
-        li.innerHTML = `<strong>${a.nome}</strong> ${a.livello ? `L${a.livello}` : ''}<br>${a.desc} ${a.danno ? `(${a.danno})` : ''}`;
+        li.innerHTML = `<strong>${a.nome || key}</strong> ${a.livello ? `L${a.livello}` : ''}<br>${a.desc} ${a.danno ? `(${a.danno})` : ''}`;
         ul.appendChild(li);
       }
     });
