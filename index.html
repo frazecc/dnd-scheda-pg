@@ -43,12 +43,16 @@
     </div>
 
     <script>
-        const API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://script.google.com/macros/s/AKfycbwG_MbXEp7PXQbV_cmr9w73TtfbW93MmgZ70Xq897Rdy2qk8htF3DLucBVvUotqSioaQw/exec');
+        // TUO NUOVO URL CORRETTO
+        const API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://script.google.com/macros/s/AKfycbxYkaF6GIwSaOVunn3YvQsc30Tap71YBzk8tbFBexJJhgQf22zJgf2OjOsZ3W8rJcSCfg/exec');
         
         async function caricaDati() {
             try {
+                console.log('🔄 Caricando:', API_URL);
                 const response = await fetch(API_URL);
                 const data = await response.json();
+                console.log('✅ Dati:', data);
+                
                 const pg = data.pg || {};
                 
                 const infoHTML = `
@@ -87,8 +91,8 @@
                 document.getElementById('content').style.display = 'block';
                 
             } catch(error) {
-                document.getElementById('loading').innerHTML = '❌ Errore caricamento. Controlla foglio "SchedaPG" e API.';
-                console.error(error);
+                document.getElementById('loading').innerHTML = `❌ Errore: ${error.message}`;
+                console.error('Errore:', error);
             }
         }
         
