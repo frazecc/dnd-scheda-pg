@@ -16,7 +16,10 @@ window.loadData = async function() {
     
     console.log('✅ Mappate:', mappate);
     
-    // 🎯 MAPPING INTELLIGENTE: "azione" → "1azione"
+    // 🔧 FORZA VISIBILITÀ TAB AZIONI
+    window.showTab('actions');
+    
+    // MAPPING: "azione" → UL "1azione"
     const tagMapping = {
       'azione': '1azione',
       'azione bonus': '1azionbonus',
@@ -27,9 +30,11 @@ window.loadData = async function() {
     
     Object.entries(tagMapping).forEach(([tagSheet, ulId]) => {
       const ul = document.getElementById(ulId);
+      console.log(`🔍 Cerco UL #${ulId}:`, ul ? '✅ TROVATO' : '❌ MANCANTE');
+      
       if (ul) {
         const filtered = mappate.filter(a => a.tag === tagSheet);
-        console.log(`📋 ${tagSheet} → UL ${ulId}: ${filtered.length}`);
+        console.log(`📋 ${tagSheet} → ${filtered.length} azioni:`, filtered[0]?.nome);
         
         ul.innerHTML = filtered.length ? 
           filtered.map(a => 
@@ -37,20 +42,23 @@ window.loadData = async function() {
               ${a.danno ? `<span class="danno">(${a.danno})</span>` : ''}
               ${a.note ? `<br><small>${a.note}</small>` : ''}</li>`
           ).join('') : '<li>Nessuna azione</li>';
+        
+        console.log(`✅ ${ulId} popolato con ${filtered.length}`);
       }
     });
     
   } catch(e) {
     console.error('❌', e);
-    alert('Errore: ' + e.message);
   }
 };
 
 window.showTab = function(tab) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tabs button').forEach(el => el.classList.remove('active'));
-  document.getElementById(tab)?.classList.add('active');
-  document.getElementById(tab + '-tab')?.classList.add('active');
+  const targetTab = document.getElementById(tab);
+  if (targetTab) targetTab.classList.add('active');
+  const targetBtn = document.getElementById(tab + '-tab');
+  if (targetBtn) targetBtn.classList.add('active');
 };
 
 document.addEventListener('DOMContentLoaded', () => {
