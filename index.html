@@ -43,7 +43,7 @@
     </div>
 
     <script>
-        const API_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://script.google.com/macros/s/AKfycbwG_MbXEp7PXQbV_cmr9w73TtfbW93MmgZ70Xq897Rdy2qk8htF3DLucBVvUotqSioaQw/exec');
+        const API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://script.google.com/macros/s/AKfycbwG_MbXEp7PXQbV_cmr9w73TtfbW93MmgZ70Xq897Rdy2qk8htF3DLucBVvUotqSioaQw/exec');
         
         async function caricaDati() {
             try {
@@ -51,25 +51,23 @@
                 const data = await response.json();
                 const pg = data.pg || {};
                 
-                // Info base
                 const infoHTML = `
                     <div><strong>Nome:</strong> ${pg.nome || 'N/A'}</div>
                     <div><strong>Razza:</strong> ${pg.razza || 'N/A'}</div>
                     <div><strong>Classe:</strong> ${pg.classe || 'N/A'} ${pg.livello || ''}</div>
-                    <div><strong>PF:</strong> ${pg.pf_max || '0'}/<span id="pf-max">${pg.pf_max || '0'}</span></div>
+                    <div><strong>PF:</strong> ${pg.pf_max || '0'}/${pg.pf_max || '0'}</div>
                     <div><strong>CA:</strong> ${pg.ca || '0'}</div>
                     <div><strong>Allineamento:</strong> ${pg.allineamento || 'N/A'}</div>
                 `;
                 document.getElementById('info-base').innerHTML = infoHTML;
                 
-                // Stats con modificatori
                 const stats = [
-                    {nome: 'Forza', valore: pg.forza},
-                    {nome: 'Destrezza', valore: pg.destrezza},
-                    {nome: 'Costituzione', valore: pg.costituzione},
-                    {nome: 'Intelligenza', valore: pg.intelligenza},
-                    {nome: 'Saggezza', valore: pg.saggezza},
-                    {nome: 'Carisma', valore: pg.carisma}
+                    {nome: 'Forza', valore: pg.forza || 10},
+                    {nome: 'Destrezza', valore: pg.destrezza || 10},
+                    {nome: 'Costituzione', valore: pg.costituzione || 10},
+                    {nome: 'Intelligenza', valore: pg.intelligenza || 10},
+                    {nome: 'Saggezza', valore: pg.saggezza || 10},
+                    {nome: 'Carisma', valore: pg.carisma || 10}
                 ];
                 
                 const statsHTML = stats.map(stat => {
@@ -89,7 +87,7 @@
                 document.getElementById('content').style.display = 'block';
                 
             } catch(error) {
-                document.getElementById('loading').innerHTML = '❌ Errore caricamento. Controlla il foglio "SchedaPG".';
+                document.getElementById('loading').innerHTML = '❌ Errore caricamento. Controlla foglio "SchedaPG" e API.';
                 console.error(error);
             }
         }
