@@ -1,36 +1,48 @@
-// 🔧 FUNZIONI GLOBALI per onclick
+// 🔧 NUOVA URL APPS SCRIPT
 window.loadData = async function() {
   try {
-    console.log('🔄 Aggiornamento Sheet...');
-    const res = await fetch('https://script.google.com/macros/s/AKfycbw_e4TzWKRl-q5lCV60uudyc1bUolXo5Fu5OpINK3SIF44ebfbBHAMDyyWrc5qyqCEh2g/exec');
-    const data = await res.json();
-    console.log('📊 Dati:', data);
+    console.log('🔄 Caricando nuova API...');
+    const res = await fetch('https://script.google.com/macros/s/AKfycbzFG1tF3gnuZYL7Ta0em7Qu4KSS4ISB1B8m9i_YRRACfo9wSfN1oFuFzmWdZ5TGThY5/exec');
+    const response = await res.json();
+    console.log('📊 API NUOVA:', response.tutteAzioni?.length || 0);
     
-    // Popola UL esistenti
-    const uls = {
+    const azioni = response.tutteAzioni || [];
+    console.log('🔍 Prima azione:', azioni[0]);
+    
+    // MAPPATURA ESATTA oggetti Apps Script
+    const mappate = azioni.map(row => ({
+      nome: row.nome || '',
+      desc: row.desc || '',
+      tag: row.tag || 'altro',
+      danno: row.danno || ''
+    })).filter(a => a.nome);
+    
+    console.log('✅ Mappate:', mappate);
+    
+    // POPOLA UL del tuo HTML
+    const ulMapping = {
       '1azione': '1 azione',
       '1azionbonus': '1 azione bonus',
-      'reazione': 'reazione',
+      'reazione': 'reazione', 
       'rituale': 'rituale',
       'altro': 'altro'
     };
     
-    Object.entries(uls).forEach(([id, tag]) => {
-      const ul = document.getElementById(id);
+    Object.entries(ulMapping).forEach(([ulId, tagName]) => {
+      const ul = document.getElementById(ulId);
       if (ul) {
-        // Cerca azioni con questo tag nei dati
-        const azioni = [];
-        if (data.tutteAzioni) {
-          data.tutteAzioni.forEach(row => {
-            if (row.tag === tag) azioni.push(row);
-          });
-        }
-        ul.innerHTML = azioni.length ? 
-          azioni.map(a => `<li><strong>${a.nome}</strong>: ${a.desc}${a.danno ? ` (${a.danno})` : ''}</li>`).join('') :
-          '<li>Nessuna</li>';
+        const filtered = mappate.filter(a => a.tag === tagName || a.tag.includes(tagName));
+        console.log(`UL ${ulId} (${tagName}): ${filtered.length}`);
+        
+        ul.innerHTML = filtered.length ? 
+          filtered.map(a => 
+            `<li><strong>${a.nome}</strong>: ${a.desc}
+              ${a.danno ? `<span class="danno">(${a.danno})</span>` : ''}
+              ${a.note ? `<br><small>${a.note}</small>` : ''}</li>`
+          ).join('') : '<li>Nessuna azione</li>';
       }
     });
-    console.log('✅ Popolato!');
+    
   } catch(e) {
     console.error('❌', e);
     alert('Errore: ' + e.message);
@@ -38,18 +50,13 @@ window.loadData = async function() {
 };
 
 window.showTab = function(tab) {
-  console.log('👆 Tab:', tab);
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tabs button').forEach(el => el.classList.remove('active'));
-  const targetTab = document.getElementById(tab);
-  if (targetTab) targetTab.classList.add('active');
-  const targetBtn = document.getElementById(tab + '-tab');
-  if (targetBtn) targetBtn.classList.add('active');
+  document.getElementById(tab)?.classList.add('active');
+  document.getElementById(tab + '-tab')?.classList.add('active');
 };
 
-// 🚀 AUTO-START
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Scheda attiva!');
-  // Testa subito
+  console.log('🚀 SCHEDA PRONTA!');
   setTimeout(window.loadData, 1500);
 });
