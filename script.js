@@ -1,38 +1,35 @@
-// 🔧 NUOVA URL APPS SCRIPT
 window.loadData = async function() {
   try {
-    console.log('🔄 Caricando nuova API...');
+    console.log('🔄 Caricando...');
     const res = await fetch('https://script.google.com/macros/s/AKfycbzFG1tF3gnuZYL7Ta0em7Qu4KSS4ISB1B8m9i_YRRACfo9wSfN1oFuFzmWdZ5TGThY5/exec');
     const response = await res.json();
-    console.log('📊 API NUOVA:', response.tutteAzioni?.length || 0);
+    console.log('📊 API:', response.tutteAzioni?.length || 0);
     
     const azioni = response.tutteAzioni || [];
-    console.log('🔍 Prima azione:', azioni[0]);
-    
-    // MAPPATURA ESATTA oggetti Apps Script
     const mappate = azioni.map(row => ({
       nome: row.nome || '',
       desc: row.desc || '',
       tag: row.tag || 'altro',
-      danno: row.danno || ''
+      danno: row.danno || '',
+      note: row.note || ''
     })).filter(a => a.nome);
     
     console.log('✅ Mappate:', mappate);
     
-    // POPOLA UL del tuo HTML
-    const ulMapping = {
-      '1azione': '1 azione',
-      '1azionbonus': '1 azione bonus',
-      'reazione': 'reazione', 
+    // 🎯 MAPPING INTELLIGENTE: "azione" → "1azione"
+    const tagMapping = {
+      'azione': '1azione',
+      'azione bonus': '1azionbonus',
+      'reazione': 'reazione',
       'rituale': 'rituale',
       'altro': 'altro'
     };
     
-    Object.entries(ulMapping).forEach(([ulId, tagName]) => {
+    Object.entries(tagMapping).forEach(([tagSheet, ulId]) => {
       const ul = document.getElementById(ulId);
       if (ul) {
-        const filtered = mappate.filter(a => a.tag === tagName || a.tag.includes(tagName));
-        console.log(`UL ${ulId} (${tagName}): ${filtered.length}`);
+        const filtered = mappate.filter(a => a.tag === tagSheet);
+        console.log(`📋 ${tagSheet} → UL ${ulId}: ${filtered.length}`);
         
         ul.innerHTML = filtered.length ? 
           filtered.map(a => 
@@ -57,6 +54,6 @@ window.showTab = function(tab) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 SCHEDA PRONTA!');
+  console.log('🚀 PRONTO!');
   setTimeout(window.loadData, 1500);
 });
