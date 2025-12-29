@@ -37,21 +37,17 @@
     </div>
 
     <script>
-        // CORS PROXY + TUO API (funziona SEMPRE)
-        const API_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://script.google.com/macros/s/AKfycbwgEpUakdFSPITj2Xq4LZ0hIV3huVZz08Pw_fHxU6YPZ1H1QWGZbv25iR45aDKAtWOX1Q/exec');
+        const API_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://script.google.com/macros/s/AKfycbwG_MbXEp7PXQbV_cmr9w73TtfbW93MmgZ70Xq897Rdy2qk8htF3DLucBVvUotqSioaQw/exec');
         
         async function caricaAzioni() {
             const container = document.getElementById('azioni');
             try {
-                console.log('Fetching:', API_URL);
                 const response = await fetch(API_URL);
+                const data = await response.json();
+                const azioni = data.azioni || [];
                 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const azioni = await response.json();
-                
-                if (!Array.isArray(azioni)) {
-                    container.innerHTML = '<div class="error">⚠️ Dati non validi dal Sheet. Aggiungi righe!</div>';
+                if (!Array.isArray(azioni) || azioni.length === 0) {
+                    container.innerHTML = '<div class="error">⚠️ Nessuna azione nel foglio "Azioni". Aggiungi dati!</div>';
                     return;
                 }
                 
@@ -70,7 +66,7 @@
                     
                     gruppo.push(`
                         <li>
-                            <div class="nome-azione">${azione.nome || 'N/A'}</div>
+                            <div class="nome-azione">${azione.nome || 'Senza nome'}</div>
                             <div class="dettagli">${dettagli}</div>
                         </li>
                     `);
@@ -79,23 +75,25 @@
                 container.innerHTML = '';
                 Object.entries(gruppi).forEach(([tipo,lista]) => {
                     if (lista.length) {
+                        const titoli = {
+                            '1 action': '⚔️ 1 Azione',
+                            'Bonus Action': '⭐ Azione Bonus', 
+                            'Reazione': '🛡️ Reazione',
+                            'Altro': '📋 Altro'
+                        };
                         container.innerHTML += `
                             <div class="azione-gruppo">
-                                <h2>${tipo === '1 action' ? '⚔️ 1 Azione' : 
-                                    tipo === 'Bonus Action' ? '⭐ Azione Bonus' : 
-                                    tipo === 'Reazione' ? '🛡️ Reazione' : '📋 Altro'}</h2>
+                                <h2>${titoli[tipo] || tipo}</h2>
                                 <ul class="lista-azioni">${lista.join('')}</ul>
                             </div>`;
                     }
                 });
                 
             } catch(error) {
-                console.error(error);
                 container.innerHTML = `
                     <div class="error">
-                        ❌ Errore caricamento<br>
-                        <small>API: ${API_URL.substring(0,60)}...<br>
-                        F12 per dettagli tecnici</small>
+                        ❌ Errore: ${error.message}<br>
+                        <small>Testa API: <a href="https://script.google.com/macros/s/AKfycbwG_MbXEp7PXQbV_cmr9w73TtfbW93MmgZ70Xq897Rdy2qk8htF3DLucBVvUotqSioaQw/exec" target="_blank">Link</a></small>
                     </div>`;
             }
         }
