@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html><head><title>Azioni PG</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="favicon.ico"></head>
+<body>
+  <h1>Azioni</h1>
+  <div id="azioni"></div>
+  <a href="index.html">Scheda</a>
+  <script>
+    fetch('TUO_URL_APPS_SCRIPT')
+      .then(r=>r.json())
+      .then(data=>{
+        const gruppi = { '1 action':[], 'Bonus Action':[], 'Reazione':[], 'Altro':[] };
+        data.forEach(a=>{
+          let ct = a['casting time'] || 'Altro';
+          gruppi[ct].push(a);
+        });
+        
+        let html = '';
+        for (let tipo in gruppi) {
+          html += `<h2>${tipo}</h2><ul>`;
+          gruppi[tipo].forEach(a=>{
+            html += `<li><strong>${a.nome}</strong>`;
+            delete a.nome;
+            for (let k in a) html += ` <span>${k}: ${a[k]}</span>`;
+            html += '</li>';
+          });
+          html += '</ul>';
+        }
+        document.getElementById('azioni').innerHTML = html;
+      });
+  </script>
+</body></html>
