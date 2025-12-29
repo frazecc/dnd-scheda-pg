@@ -6,54 +6,52 @@ window.loadData = async function() {
     const response = await res.json();
     const mappate = response.tutteAzioni || [];
     
-    console.log('ALL DATA:', mappate);
+    console.log('ALL DATA completa:', mappate);
     
-    // RIEMPI INPUT HEADER DALL'ULTIMA RIGA
-    if (mappate.length > 0) {
-      const ultimaRiga = mappate[mappate.length - 1];
-      ['razza','nomePG','classe','livello','giocatore','background','allineamento'].forEach(id => {
-        if (ultimaRiga[id]) document.getElementById(id).value = ultimaRiga[id];
+    // RIEMPI TUTTI GLI INPUT DA OGNI RIGA
+    mappate.forEach(row => {
+      Object.keys(row).forEach(key => {
+        const el = document.getElementById(key);
+        if (el && row[key]) {
+          el.value = row[key];
+          console.log(`Riempito ${key}: ${row[key]}`);
+        }
       });
-    }
+    });
     
-    window.showTab('actions');
-    
-    // PULISCI TUTTI
+    // PULISCI LISTE
     ['1azione','1azionbonus','reazione','rituale','altro'].forEach(id => {
       const ul = document.getElementById(id);
       if (ul) ul.innerHTML = '';
     });
     
-    // AGGREGA AZIONI E SPELL CON DETTAGLI COMPLETI
+    // CLASSIFICA E MOSTRA AZIONI
     mappate.forEach(a => {
       let ulId = 'altro';
-      if (a.tag && a.tag.includes('azione') && !a.tag.includes('bonus')) ulId = '1azione';
-      else if (a.tag && a.tag.includes('bonus')) ulId = '1azionbonus';
-      else if (a.tag && a.tag.includes('reazione')) ulId = 'reazione';
-      else if (a.tag && a.tag.includes('rituale')) ulId = 'rituale';
+      if (a.tag?.includes('azione') && !a.tag.includes('bonus')) ulId = '1azione';
+      else if (a.tag?.includes('bonus')) ulId = '1azionbonus';
+      else if (a.tag?.includes('reazione')) ulId = 'reazione';
+      else if (a.tag?.includes('rituale')) ulId = 'rituale';
       
       const ul = document.getElementById(ulId);
       if (ul) {
         const li = document.createElement('li');
         li.innerHTML = `
-          <strong>${a.Oggetto || a.Nome || a.nome}</strong> 
+          <strong>${a.nome || a.Oggetto || a.Nome}</strong> 
           ${a.livello ? `L${a.livello}` : ''}
-          ${a.scuola ? `<small>(${a.scuola})</small>` : ''}
-          <br><small>${a['Descrizione dell\'azione'] || a['effetto sintetico'] || a.desc || ''}</small>
+          <br><small>${a.desc || a['Descrizione dell\'azione'] || a['effetto sintetico']}</small>
           ${a['Casting time'] || a['casting time'] ? `<br>⏱️ ${a['Casting time'] || a['casting time']}` : ''}
           ${a.range ? `<br>📏 ${a.range}` : ''}
           ${a.durata ? `<br>⏳ ${a.durata}` : ''}
-          ${a['tcp o ts'] || a.tpc ? `<br>🎯 ${a['tcp o ts'] || a.tpc}` : ''}
-          ${a.componenti ? `<br>✨ ${a.componenti}` : ''}
-          ${a.concentrazione ? `<br>🧠 Concentrazione` : ''}
-          ${a.rituale ? `<br>📜 Rituale` : ''}
+          ${a.tpc || a['tcp o ts'] ? `<br>🎯 ${a.tpc || a['tcp o ts']}` : ''}
           ${a.danno ? `<br>⚔️ ${a.danno} (${a['tipo di danno'] || ''})` : ''}
-          ${a['a lv più alti'] || a['effetto esteso'] ? `<br>📈 ${a['a lv più alti'] || a['effetto esteso']}` : ''}
           ${a.note ? `<br>📝 ${a.note}` : ''}
         `;
         ul.appendChild(li);
       }
     });
+    
+    window.showTab('actions');
     
   } catch(e) {
     console.error(e);
