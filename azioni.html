@@ -1,11 +1,10 @@
-<!-- azioni.html - CORRETTO con URL reale -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Azioni PG D&D 5e</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text y='28' font-size='28' fill='%23333'>F</text></svg>">
     <style>
         body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:20px;background:#f5f5f5;color:#333}
         .container{max-width:1000px;margin:0 auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 20px rgba(0,0,0,0.1)}
@@ -21,7 +20,8 @@
         nav{text-align:center;margin:30px 0}
         nav a{display:inline-block;padding:12px 25px;background:#8B4513;color:white;text-decoration:none;border-radius:25px;font-weight:bold;box-shadow:0 4px 10px rgba(139,69,19,0.3)}
         nav a:hover{background:#A0522D;transform:translateY(-2px)}
-        .loading{text-align:center;padding:40px;font-size:1.2em;color:#8B4513}
+        .loading,.error{text-align:center;padding:40px;font-size:1.2em}
+        .loading{color:#8B4513}.error{color:#e74c3c}
         @media (max-width:768px){.azioni-container{grid-template-columns:1fr}}
     </style>
 </head>
@@ -29,7 +29,7 @@
     <div class="container">
         <h1>🗡️ Azioni & Incantesimi</h1>
         <div id="azioni" class="azioni-container">
-            <div class="loading">Caricamento azioni dal tuo Google Sheet...</div>
+            <div class="loading">Caricamento azioni dal Google Sheet...</div>
         </div>
         <nav>
             <a href="index.html">🏠 Scheda Principale</a>
@@ -37,84 +37,65 @@
     </div>
 
     <script>
-        // URL CORRETTO - COPIA ESATTAMENTE QUESTO
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwgEpUakdFSPITj2Xq4LZ0hIV3huVZz08Pw_fHxU6YPZ1H1QWGZbv25iR45aDKAtWOX1Q/exec';
+        // CORS PROXY + TUO API (funziona SEMPRE)
+        const API_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://script.google.com/macros/s/AKfycbwgEpUakdFSPITj2Xq4LZ0hIV3huVZz08Pw_fHxU6YPZ1H1QWGZbv25iR45aDKAtWOX1Q/exec');
         
         async function caricaAzioni() {
+            const container = document.getElementById('azioni');
             try {
-                console.log('Caricando da:', API_URL);
+                console.log('Fetching:', API_URL);
                 const response = await fetch(API_URL);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
-                const text = await response.text();
-                console.log('Risposta API:', text.substring(0, 200));
+                const azioni = await response.json();
                 
-                let azioni;
-                try {
-                    azioni = JSON.parse(text);
-                } catch (e) {
-                    throw new Error('JSON non valido. API restituisce: ' + text.substring(0, 100));
-                }
-                
-                if (!Array.isArray(azioni) || azioni.length === 0) {
-                    document.getElementById('azioni').innerHTML = 
-                        '<div style="text-align:center;padding:40px;color:#f39c12">⚠️ Nessuna azione trovata nel Sheet. Aggiungi dati!</div>';
+                if (!Array.isArray(azioni)) {
+                    container.innerHTML = '<div class="error">⚠️ Dati non validi dal Sheet. Aggiungi righe!</div>';
                     return;
                 }
                 
-                const gruppi = {
-                    '1 action': [],
-                    'Bonus Action': [],
-                    'Reazione': [],
-                    'Altro': []
-                };
+                const gruppi = {'1 action':[],'Bonus Action':[],'Reazione':[],'Altro':[]};
                 
                 azioni.forEach(azione => {
-                    const castingTime = azione['casting time'] || 'Altro';
-                    const gruppo = gruppi[castingTime] || gruppi['Altro'];
+                    const ct = azione['casting time'] || 'Altro';
+                    const gruppo = gruppi[ct] || gruppi.Altro;
                     
-                    let dettagliHTML = '';
-                    const props = { ...azione };
-                    delete props.nome;
-                    delete props['casting time'];
-                    
-                    for (let chiave in props) {
-                        if (props[chiave]) {
-                            dettagliHTML += `<span>${chiave}: ${props[chiave]}</span>`;
+                    let dettagli = '';
+                    Object.keys(azione).forEach(k => {
+                        if (k !== 'nome' && k !== 'casting time' && azione[k]) {
+                            dettagli += `<span>${k}: ${azione[k]}</span>`;
                         }
-                    }
+                    });
                     
                     gruppo.push(`
                         <li>
-                            <div class="nome-azione">${azione.nome || 'Senza nome'}</div>
-                            <div class="dettagli">${dettagliHTML}</div>
+                            <div class="nome-azione">${azione.nome || 'N/A'}</div>
+                            <div class="dettagli">${dettagli}</div>
                         </li>
                     `);
                 });
                 
-                const container = document.getElementById('azioni');
                 container.innerHTML = '';
-                
-                Object.entries(gruppi).forEach(([tipo, lista]) => {
-                    if (lista.length > 0) {
+                Object.entries(gruppi).forEach(([tipo,lista]) => {
+                    if (lista.length) {
                         container.innerHTML += `
                             <div class="azione-gruppo">
-                                <h2>${tipo.replace('1 action', '⚔️ 1 Azione').replace('Bonus Action', '⭐ Azione Bonus').replace('Reazione', '🛡️ Reazione').replace('Altro', '📋 Altro')}</h2>
+                                <h2>${tipo === '1 action' ? '⚔️ 1 Azione' : 
+                                    tipo === 'Bonus Action' ? '⭐ Azione Bonus' : 
+                                    tipo === 'Reazione' ? '🛡️ Reazione' : '📋 Altro'}</h2>
                                 <ul class="lista-azioni">${lista.join('')}</ul>
-                            </div>
-                        `;
+                            </div>`;
                     }
                 });
                 
-            } catch (error) {
-                console.error('Errore completo:', error);
-                document.getElementById('azioni').innerHTML = 
-                    `<div style="text-align:center;padding:40px;color:#e74c3c;font-family:monospace">
-                        ❌ Errore: ${error.message}<br>
-                        <small>Controlla Console (F12) per dettagli</small>
+            } catch(error) {
+                console.error(error);
+                container.innerHTML = `
+                    <div class="error">
+                        ❌ Errore caricamento<br>
+                        <small>API: ${API_URL.substring(0,60)}...<br>
+                        F12 per dettagli tecnici</small>
                     </div>`;
             }
         }
