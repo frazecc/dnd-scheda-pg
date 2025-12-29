@@ -7,72 +7,107 @@
     .band { height: 200px; border: 1px solid #ccc; padding: 20px; overflow-x: auto; white-space: nowrap; box-sizing: border-box; }
     .band1 { background: #f0f8ff; }
     .band2 { background: #fff0f5; }
-    .band3 { background: #f5f5f5; height: 200px; } /* Vuota */
-    .cell { display: inline-block; min-width: 100px; padding: 10px; margin: 2px; border: 1px solid #ddd; background: white; }
+    .band3 { background: #f5f5f5; height: 200px; }
+    .cell { display: inline-block; min-width: 120px; padding: 10px; margin: 2px; border: 1px solid #ddd; background: white; }
     .editable { border-color: #007bff; }
     .editable:focus { outline: none; box-shadow: 0 0 5px #007bff; }
     .buttons { position: fixed; top: 10px; right: 10px; z-index: 10; }
-    button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+    button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
     button:hover { background: #0056b3; }
     button:disabled { background: #ccc; cursor: not-allowed; }
+    .status { position: fixed; top: 10px; left: 10px; background: #28a745; color: white; padding: 10px; border-radius: 4px; display: none; }
   </style>
 </head>
 <body>
+  <div class="status" id="status"></div>
   <div class="buttons">
-    <button id="loadBtn">Carica dal Sheet</button>
-    <button id="saveBtn">Salva su Sheet</button>
+    <button id="loadBtn">📥 Carica dal Sheet</button>
+    <button id="saveBtn">💾 Salva su Sheet</button>
   </div>
   
-  <div id="band1" class="band band1">Riga 1: Carica dati per visualizzare</div>
-  <div id="band2" class="band band2">Riga 2: Carica dati per visualizzare</div>
-  <div id="band3" class="band band3">Terza banda (vuota - da definire)</div>
+  <div id="band1" class="band band1">Riga 1: Clicca "Carica dal Sheet"</div>
+  <div id="band2" class="band band2">Riga 2: Clicca "Carica dal Sheet" </div>
+  <div id="band3" class="band band3">Banda 3 (vuota - futura)</div>
 
   <script>
-    const WEB_APP_URL = 'INSERISCI_TUO_URL_EXEC_QUI'; // Es. https://script.google.com/macros/s/TUO_ID/exec
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyYldwlj1MEjRJD3wmEdL8B0bhYJTqGUrKIj8HS0enESpadLRAmvq_SjzrBkbnPNJZ43w/exec';
+    
+    const statusEl = document.getElementById('status');
+    
+    function showStatus(msg, isError = false) {
+      statusEl.textContent = msg;
+      statusEl.style.background = isError ? '#dc3545' : '#28a745';
+      statusEl.style.display = 'block';
+      setTimeout(() => statusEl.style.display = 'none', 3000);
+    }
     
     async function loadData() {
       document.getElementById('loadBtn').disabled = true;
+      document.getElementById('saveBtn').disabled = true;
+      showStatus('Caricamento...');
+      
       try {
         const res = await fetch(`${WEB_APP_URL}?action=read`);
         const data = await res.json();
+        
         if (data.success) {
-          renderBand('band1', data.row1);
-          renderBand('band2', data.row2);
+          renderBand('band1', data.row1 || []);
+          renderBand('band2', data.row2 || []);
+          showStatus('Dati caricati! Modifica e salva.');
         } else {
-          alert('Errore: ' + data.error);
+          throw new Error(data.error || 'Risposta non valida');
         }
       } catch (err) {
-        alert('Errore caricamento: ' + err);
+        showStatus('Errore caricamento: ' + err.message, true);
+        console.error(err);
+      } finally {
+        document.getElementById('loadBtn').disabled = false;
+        document.getElementById('saveBtn').disabled = false;
       }
-      document.getElementById('loadBtn').disabled = false;
     }
     
     async function saveData() {
       document.getElementById('saveBtn').disabled = true;
+      document.getElementById('loadBtn').disabled = true;
+      showStatus('Salvataggio...');
+      
       try {
-        const row1 = Array.from(document.querySelectorAll('#band1 .cell input')).map(el => el.value);
-        const row2 = Array.from(document.querySelectorAll('#band2 .cell input')).map(el => el.value);
+        const row1 = Array.from(document.querySelectorAll('#band1 .cell input')).map(el => el.value || '');
+        const row2 = Array.from(document.querySelectorAll('#band2 .cell input')).map(el => el.value || '');
+        
+        const formData = new FormData();
+        formData.append('action', 'write');
+        formData.append('row1', JSON.stringify(row1));
+        formData.append('row2', JSON.stringify(row2));
+        
         const res = await fetch(WEB_APP_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `action=write&row1=${encodeURIComponent(JSON.stringify(row1))}&row2=${encodeURIComponent(JSON.stringify(row2))}`
+          body: formData
         });
+        
         const data = await res.json();
         if (data.success) {
-          alert('Salvato con successo!');
+          showStatus('Salvato con successo sul Sheet!');
         } else {
-          alert('Errore: ' + data.error);
+          throw new Error(data.error || 'Errore server');
         }
       } catch (err) {
-        alert('Errore salvataggio: ' + err);
+        showStatus('Errore salvataggio: ' + err.message, true);
+        console.error(err);
+      } finally {
+        document.getElementById('saveBtn').disabled = false;
+        document.getElementById('loadBtn').disabled = false;
       }
-      document.getElementById('saveBtn').disabled = false;
     }
     
     function renderBand(bandId, rowData) {
       const band = document.getElementById(bandId);
+      if (!rowData || rowData.length === 0) {
+        band.innerHTML = 'Nessun dato trovato';
+        return;
+      }
       band.innerHTML = rowData.map((cell, i) => 
-        `<span class="cell editable"><input type="text" value="${cell || ''}" data-col="${i}"></span>`
+        `<span class="cell editable"><input type="text" value="${(cell || '').toString()}" data-col="${i}"></span>`
       ).join('');
     }
     
