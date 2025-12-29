@@ -4,8 +4,10 @@ let pgData = {};
 
 async function loadData() {
   try {
+    console.log('Caricamento dati...');
     const res = await fetch(API_URL);
     const {tutteAzioni} = await res.json();
+    console.log('Dati ricevuti:', tutteAzioni);
     
     pgData = {
       '1 azione': [], '1 azione bonus': [], 'reazione': [],
@@ -18,21 +20,32 @@ async function loadData() {
         else pgData['altro'].push(azione);
       }
     });
+    
+    console.log('pgData categorizzata:', pgData);
     populateActions();
   } catch(e) { 
-    alert('Errore API: ' + e); 
-    console.error(e);
+    console.error('Errore API:', e);
+    alert('Errore caricamento: ' + e.message); 
   }
 }
 
 function populateActions() {
-  ['1 azione','1 azione bonus','reazione','rituale','altro'].forEach(tipo => {
+  const tipi = ['1 azione','1 azione bonus','reazione','rituale','altro'];
+  
+  tipi.forEach(tipo => {
     const cleanId = tipo.replace(/ /g, '');
     const ul = document.getElementById(cleanId);
+    
+    // VERIFICA che l'elemento esista
+    if (!ul) {
+      console.error('UL mancante:', cleanId);
+      return;
+    }
+    
     const azioni = pgData[tipo] || [];
     ul.innerHTML = azioni.length ? 
       azioni.map(a => 
-        `<li><strong>${a.nome}</strong>: ${a.desc} 
+        `<li><strong>${a.nome}</strong>: ${a.desc || ''} 
           ${a.danno ? `<span class="danno">(${a.danno})</span>` : ''} 
           ${a.note ? `<br><small>${a.note}</small>` : ''}
         </li>`
@@ -47,9 +60,19 @@ function showTab(tab) {
   document.getElementById(tab + '-tab')?.classList.add('active');
 }
 
-// Auto-load all'avvio
-loadData();
-
-document.getElementById('nomePG').addEventListener('input', e => 
-  localStorage.setItem('nomePG', e.target.value)
-);
+// ✅ ASPETTA DOM PRIMA DI ESEGUIRE
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM caricato');
+  
+  // Carica nomePG salvato
+  const nomePG = document.getElementById('nomePG');
+  if (nomePG) {
+    nomePG.value = localStorage.getItem('nomePG') || '';
+    nomePG.addEventListener('input', e => 
+      localStorage.setItem('nomePG', e.target.value)
+    );
+  }
+  
+  // Auto-load dopo 500ms (tempo per render HTML)
+  setTimeout(loadData, 500);
+});
