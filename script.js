@@ -1,5 +1,5 @@
-// 👇 SOSTITUISCI CON LA TUA NUOVA URL APPS SCRIPT
-const API_URL = 'INCOLLA QUI LA NUOVA URL DOPO REDEPLOY';
+// ✅ NUOVA URL "all per sito"
+const API_URL = 'https://script.google.com/macros/s/AKfycbyFHJV0XRslgNnBtwbclGZtqS_e5HRvPnVovhSmegectgnMIFrM48N5mzqKGltM0KkViA/exec';
 
 window.loadData = async function() {
   try {
@@ -29,7 +29,7 @@ window.loadData = async function() {
             `<li><strong>${a.nome}</strong> 
               ${a.livello ? `<small>L${a.livello}</small>` : ''}
               <br>${a.desc}
-              ${a.danno ? `<span class="danno">(${a.danno} ${a.tipoDanno})</span>` : ''}
+              ${a.danno ? `<span class="danno">(${a.danno} ${a.tipoDanno||''})</span>` : ''}
               ${a.rituale ? '<span class="rituale">📜 RITUALE</span>' : ''}
               ${a.note ? `<br><small>${a.note}</small>` : ''}
             </li>`
@@ -50,6 +50,6 @@ window.showTab = function(tab) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 PRONTO!');
+  console.log('🚀 "all per sito" PRONTO!');
   setTimeout(window.loadData, 1500);
 });
