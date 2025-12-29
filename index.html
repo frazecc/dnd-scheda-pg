@@ -3,32 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scheda PG D&D 5e</title>
+  <title>Scheda PG D&D 5e Ufficiale</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>🧙 Scheda PG D&D 5e</h1>
-  
-  <nav class="tabs">
-    <button onclick="showTab('main')" id="main-tab" class="active">📋 Principale</button>
-    <button onclick="showTab('actions')" id="actions-tab">⚔️ Azioni</button>
-    <button onclick="loadData()">🔄 Aggiorna da Sheet</button>
-  </nav>
+  <div class="page">
+    <!-- HEADER UFFICIALE -->
+    <header class="header">
+      <div class="header-left">
+        <input id="razza" placeholder="RAZZA" class="big-input">
+        <input id="nomePG" placeholder="NOME PERSONAGGIO" class="big-input">
+      </div>
+      <div class="header-right">
+        <input id="classe" placeholder="CLASSE">
+        <input id="livello" placeholder="LIVELLO">
+        <input id="giocatore" placeholder="NOME GIOCATORE">
+        <input id="background" placeholder="BACKGROUND">
+        <input id="allineamento" placeholder="ALLINEAMENTO">
+      </div>
+    </header>
 
-  <div id="main" class="tab-content active">
-    <h2>Scheda Base</h2>
-    <input id="nomePG" placeholder="Nome PG" />
-    <input id="classe" placeholder="Classe/Livello" />
-    <input id="hp" placeholder="HP Max" />
-  </div>
+    <!-- NAVIGAZIONE -->
+    <nav class="tabs">
+      <button onclick="showTab('stats')" id="stats-tab" class="active">📊 Caratteristiche</button>
+      <button onclick="showTab('actions')" id="actions-tab">⚔️ Azioni</button>
+      <button onclick="loadData()">🔄 Aggiorna Sheet</button>
+    </nav>
 
-  <!-- ✅ TUTTI GLI UL QUI con ID esatti -->
-  <div id="actions" class="tab-content">
-    <h2>1️⃣ Azioni</h2><ul id="1azione"></ul>
-    <h2>⚡ Azioni Bonus</h2><ul id="1azionbonus"></ul>
-    <h2>🛡️ Reazioni</h2><ul id="reazione"></ul>
-    <h2>📜 Rituali</h2><ul id="rituale"></ul>
-    <h2>❓ Altro</h2><ul id="altro"></ul>
+    <!-- COLONNA SINISTRA - CARATTERISTICHE -->
+    <div id="stats" class="tab-content active column-left">
+      <div class="stats-grid">
+        <div class="stat-block">
+          <label>FORZA</label>
+          <input id="forza" class="stat-mod">
+          <input id="forza-mod" placeholder="MOD">
+        </div>
+        <!-- Ripeti per DES, COS, INT, SAG, CAR -->
+        <div class="stat-block">
+          <label>DESTREZZA</label>
+          <input id="destrezza-mod" placeholder="MOD">
+        </div>
+        <!-- ... altre stats ... -->
+      </div>
+      
+      <div class="hp-section">
+        <label>CA</label><input id="ca">
+        <label>PF Massimi</label><input id="hp-max">
+        <label>PF Attuali</label><input id="hp-current">
+      </div>
+    </div>
+
+    <!-- COLONNA DESTRA - AZIONI EXTRA -->
+    <div id="actions" class="tab-content column-right">
+      <h2>AZIONI</h2><ul id="1azione"></ul>
+      <h2>AZIONI BONUS</h2><ul id="1azionbonus"></ul>
+      <h2>REA ZIONI</h2><ul id="reazione"></ul>
+      <h2>RITUALI</h2><ul id="rituale"></ul>
+      <h2>ALTRO</h2><ul id="altro"></ul>
+    </div>
   </div>
 
   <script src="script.js"></script>
