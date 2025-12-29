@@ -1,1 +1,3 @@
-body{font-family:Arial;margin:20px} h2{color:#333} ul{list-style:none} li{margin:10px 0;padding:10px;border:1px solid #ccc} span{margin-left:10px}
+/* style.css - Usa questo se preferisci file separato */
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;line-height:1.6}
