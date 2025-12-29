@@ -1,4 +1,3 @@
-// ✅ NUOVA URL "all per sito"
 const API_URL = 'https://script.google.com/macros/s/AKfycbyFHJV0XRslgNnBtwbclGZtqS_e5HRvPnVovhSmegectgnMIFrM48N5mzqKGltM0KkViA/exec';
 
 window.loadData = async function() {
@@ -11,7 +10,6 @@ window.loadData = async function() {
     console.log('✅ Mappate:', mappate.map(a => `${a.nome}(${a.tag})`));
     window.showTab('actions');
     
-    // MAPPING: casting time → UL
     const tagMapping = {
       'azione': '1azione', '1 azione': '1azione',
       'azione bonus': '1azionbonus', '1 azione bonus': '1azionbonus',
@@ -24,8 +22,9 @@ window.loadData = async function() {
       const ul = document.getElementById(ulId);
       if (ul) {
         const filtered = mappate.filter(a => a.tag === tagSheet);
-        ul.innerHTML = filtered.length ? 
-          filtered.map(a => 
+        if (filtered.length) {
+          // 🔧 APPEND invece di sovrascrivi
+          const html = filtered.map(a => 
             `<li><strong>${a.nome}</strong> 
               ${a.livello ? `<small>L${a.livello}</small>` : ''}
               <br>${a.desc}
@@ -33,7 +32,11 @@ window.loadData = async function() {
               ${a.rituale ? '<span class="rituale">📜 RITUALE</span>' : ''}
               ${a.note ? `<br><small>${a.note}</small>` : ''}
             </li>`
-          ).join('') : '<li>Nessuna</li>';
+          ).join('');
+          ul.innerHTML = html; // Pulisci e riempi
+        } else {
+          ul.innerHTML = '<li>Nessuna</li>';
+        }
         console.log(`📋 ${tagSheet} → ${ulId}: ${filtered.length}`);
       }
     });
